@@ -1,5 +1,6 @@
 package com.wondollar.api.response;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -18,11 +19,16 @@ import java.util.Map;
  * }
  */
 @Getter
-@RequiredArgsConstructor
 public class ErrorResponse {
     private final String code;
     private final String message;
     private final List<ValidationTuple> validation = new ArrayList<>();
+
+    @Builder
+    public ErrorResponse(String code, String message) {
+        this.code = code;
+        this.message = message;
+    }
 
     public void addValidation(String fieldName, String errorMessage) {
         ValidationTuple tuple = new ValidationTuple(fieldName, errorMessage);
