@@ -3,10 +3,10 @@ package com.wondollar.api.service;
 import com.wondollar.api.domain.Post;
 import com.wondollar.api.repository.PostRepository;
 import com.wondollar.api.request.PostCreate;
+import com.wondollar.api.request.PostSearch;
 import com.wondollar.api.response.PostResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -37,8 +37,8 @@ public class PostService {
                 .build();
     }
 
-    public List<PostResponse> getList(Pageable pageable) {
-        return postRepository.findAll(pageable).stream()
+    public List<PostResponse> getList(PostSearch postSearch) {
+        return postRepository.getList(postSearch).stream()
                 .map(PostResponse::new)
                 .toList();
     }

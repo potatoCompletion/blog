@@ -3,16 +3,13 @@ package com.wondollar.api.service;
 import com.wondollar.api.domain.Post;
 import com.wondollar.api.repository.PostRepository;
 import com.wondollar.api.request.PostCreate;
+import com.wondollar.api.request.PostSearch;
 import com.wondollar.api.response.PostResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 
 import java.util.List;
 import java.util.stream.IntStream;
@@ -84,15 +81,44 @@ class PostServiceTest {
                 .toList();
 
         postRepository.saveAll(requestPosts);
-
-        Pageable pageable = PageRequest.of(0, 5, Sort.by(Direction.ASC, "id"));
+        PostSearch postSearch = PostSearch.builder()
+                .page(1)
+                .size(10)
+                .build();
 
         // when
-        List<PostResponse> posts = postService.getList(pageable);
+        List<PostResponse> posts = postService.getList(postSearch);
 
         // then
-        assertEquals(5, posts.size());
-        assertEquals("제목 - 1", posts.get(0).getTitle());
-        assertEquals("제목 - 5", posts.get(4).getTitle());
+        assertEquals(10, posts.size());
+        assertEquals("제목 - 30", posts.get(0).getTitle());
+        assertEquals("제목 - 21", posts.get(9).getTitle());
+    }
+
+    @Test
+    @DisplayName("페이지를 0으로 요청해도 첫 페이지를 가져온다.")
+    void get0PageTest() {
+        // given
+        List<Post> requestPosts = IntStream.range(1, 31)
+                .mapToObj(i -> Post.builder()
+                        .title("제목 - " + i)
+                        .content("내용 - " + i)
+                        .build()
+                )
+                .toList();
+
+        postRepository.saveAll(requestPosts);
+        PostSearch postSearch = PostSearch.builder()
+                .page(0)
+                .size(10)
+                .build();
+
+        // when
+        List<PostResponse> posts = postService.getList(postSearch);
+
+        // then
+        assertEquals(10, posts.size());
+        assertEquals("제목 - 30", posts.get(0).getTitle());
+        assertEquals("제목 - 21", posts.get(9).getTitle());
     }
 }
