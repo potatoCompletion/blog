@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wondollar.api.domain.Post;
 import com.wondollar.api.repository.PostRepository;
 import com.wondollar.api.request.PostCreate;
+import com.wondollar.api.request.PostEdit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,8 +19,7 @@ import java.util.stream.IntStream;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -174,6 +174,50 @@ class PostControllerTest {
                 .andExpect(jsonPath("$.length()", is(10)))
                 .andExpect(jsonPath("$[0].title").value("제목 - 30"))
                 .andExpect(jsonPath("$[9].content").value("내용 - 21"))
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("글 제목 수정")
+    void postUpdateTitleTest() throws Exception {
+        // given
+        Post post = Post.builder()
+                .title("김완수")
+                .content("백엔드")
+                .build();
+
+        postRepository.save(post);
+
+        PostEdit postEdit = PostEdit.builder()
+                .title("강원")
+                .content("백엔드")
+                .build();
+
+        // when, then
+        mockMvc.perform(patch("/posts/{postId}", post.getId())
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(postEdit))
+                )
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("게시글 삭제")
+    void postDeleteTest() throws Exception {
+        // given
+        Post post = Post.builder()
+                .title("김완수")
+                .content("백엔드")
+                .build();
+
+        postRepository.save(post);
+
+        // when, then
+        mockMvc.perform(delete("/posts/{postId}", post.getId())
+                        .contentType(APPLICATION_JSON)
+                )
+                .andExpect(status().isOk())
                 .andDo(print());
     }
 }

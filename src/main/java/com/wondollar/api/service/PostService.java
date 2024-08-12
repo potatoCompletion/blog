@@ -1,10 +1,13 @@
 package com.wondollar.api.service;
 
 import com.wondollar.api.domain.Post;
+import com.wondollar.api.domain.PostEditor;
 import com.wondollar.api.repository.PostRepository;
 import com.wondollar.api.request.PostCreate;
+import com.wondollar.api.request.PostEdit;
 import com.wondollar.api.request.PostSearch;
 import com.wondollar.api.response.PostResponse;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -41,5 +44,26 @@ public class PostService {
         return postRepository.getList(postSearch).stream()
                 .map(PostResponse::new)
                 .toList();
+    }
+
+    @Transactional
+    public void edit(Long id, PostEdit postEdit) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 글입니다."));
+
+        PostEditor.PostEditorBuilder postEditorBuilder = post.toEditor();
+
+        PostEditor postEditor = postEditorBuilder.title(postEdit.getTitle())
+                .content(postEdit.getContent())
+                .build();
+
+        post.edit(postEditor);
+    }
+
+    public void delete(Long id) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 글입니다."));
+
+        postRepository.delete(post);
     }
 }

@@ -29,6 +29,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation:3.3.2'
     implementation 'com.querydsl:querydsl-jpa:5.1.0:jakarta'
     implementation 'com.querydsl:querydsl-core:5.1.0'
+    implementation 'org.apache.commons:commons-lang3:3.16.0'
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.h2database:h2'
     annotationProcessor 'org.projectlombok:lombok'

@@ -3,6 +3,7 @@ package com.wondollar.api.service;
 import com.wondollar.api.domain.Post;
 import com.wondollar.api.repository.PostRepository;
 import com.wondollar.api.request.PostCreate;
+import com.wondollar.api.request.PostEdit;
 import com.wondollar.api.request.PostSearch;
 import com.wondollar.api.response.PostResponse;
 import org.junit.jupiter.api.BeforeEach;
@@ -120,5 +121,76 @@ class PostServiceTest {
         assertEquals(10, posts.size());
         assertEquals("제목 - 30", posts.get(0).getTitle());
         assertEquals("제목 - 21", posts.get(9).getTitle());
+    }
+
+    @Test
+    @DisplayName("글 제목 수정")
+    void postUpdateTitleTest() {
+        // given
+        Post post = Post.builder()
+                .title("김완수")
+                .content("백엔드")
+                .build();
+
+        postRepository.save(post);
+
+        PostEdit postEdit = PostEdit.builder()
+                .title("강원")
+                .content("백엔드")
+                .build();
+
+        // when
+        postService.edit(post.getId(), postEdit);
+
+        //then
+        Post changedPost = postRepository.findById(post.getId())
+                .orElseThrow(() -> new RuntimeException("글이 존재하지 않습니다. id = " + post.getId()));
+        assertEquals("강원", changedPost.getTitle());
+        assertEquals("백엔드", changedPost.getContent());
+    }
+
+    @Test
+    @DisplayName("글 내용 수정")
+    void postUpdateContentTest() {
+        // given
+        Post post = Post.builder()
+                .title("김완수")
+                .content("백엔드")
+                .build();
+
+        postRepository.save(post);
+
+        // null 값은 무시하고 기존 값이 유지되어야 함
+        PostEdit postEdit = PostEdit.builder()
+                .title(null)
+                .content("개발자")
+                .build();
+
+        // when
+        postService.edit(post.getId(), postEdit);
+
+        //then
+        Post changedPost = postRepository.findById(post.getId())
+                .orElseThrow(() -> new RuntimeException("글이 존재하지 않습니다. id = " + post.getId()));
+        assertEquals("김완수", changedPost.getTitle());
+        assertEquals("개발자", changedPost.getContent());
+    }
+
+    @Test
+    @DisplayName("게시글 삭제")
+    void postDeleteTest() {
+        // given
+        Post post = Post.builder()
+                .title("김완수")
+                .content("백엔드")
+                .build();
+
+        postRepository.save(post);
+
+        // when
+        postService.delete(post.getId());
+
+        // then
+        assertEquals(0, postRepository.count());
     }
 }

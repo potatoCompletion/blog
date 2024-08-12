@@ -1,6 +1,7 @@
 package com.wondollar.api.controller;
 
 import com.wondollar.api.request.PostCreate;
+import com.wondollar.api.request.PostEdit;
 import com.wondollar.api.request.PostSearch;
 import com.wondollar.api.response.PostResponse;
 import com.wondollar.api.service.PostService;
@@ -29,8 +30,17 @@ public class PostController {
     }
 
     @GetMapping("/posts")
-
     public List<PostResponse> getList(PostSearch postSearch) {
         return postService.getList(postSearch);
+    }
+
+    @PatchMapping("/posts/{postId}")
+    public void edit(@PathVariable Long postId, @RequestBody @Valid PostEdit request) {
+        postService.edit(postId, request);
+    }
+
+    @DeleteMapping("/posts/{postId}")
+    public void delete(@PathVariable Long postId) {
+        postService.delete(postId);
     }
 }
