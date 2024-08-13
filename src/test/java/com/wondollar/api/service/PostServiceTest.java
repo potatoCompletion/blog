@@ -1,6 +1,7 @@
 package com.wondollar.api.service;
 
 import com.wondollar.api.domain.Post;
+import com.wondollar.api.exception.PostNotFound;
 import com.wondollar.api.repository.PostRepository;
 import com.wondollar.api.request.PostCreate;
 import com.wondollar.api.request.PostEdit;
@@ -15,8 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class PostServiceTest {
@@ -192,5 +192,37 @@ class PostServiceTest {
 
         // then
         assertEquals(0, postRepository.count());
+    }
+
+    @Test
+    @DisplayName("글 1개 조회 - 존재하지 않는 글")
+    void searchPostFailTest() {
+        // given
+        Post post = postRepository.save(Post.builder()
+                .title("foo")
+                .content("bar")
+                .build());
+
+        // when, then
+        assertThrows(PostNotFound.class, () -> {
+            postService.get(post.getId() + 1L);
+        });
+    }
+
+    @Test
+    @DisplayName("게시글 삭제 - 존재하지 않는 글")
+    void postDeleteFailTest() {
+        // given
+        Post post = Post.builder()
+                .title("김완수")
+                .content("백엔드")
+                .build();
+
+        postRepository.save(post);
+
+        // when, then
+        assertThrows(PostNotFound.class, () -> {
+            postService.delete(post.getId() + 1L);
+        });
     }
 }
