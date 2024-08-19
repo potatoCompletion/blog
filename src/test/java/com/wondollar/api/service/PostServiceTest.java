@@ -225,4 +225,29 @@ class PostServiceTest {
             postService.delete(post.getId() + 1L);
         });
     }
+
+    @Test
+    @DisplayName("글 내용 수정 - 존재하지 않는 글")
+    void postUpdateContentFailTest() {
+        // given
+        Post post = Post.builder()
+                .title("김완수")
+                .content("백엔드")
+                .build();
+
+        postRepository.save(post);
+
+        // null 값은 무시하고 기존 값이 유지되어야 함
+        PostEdit postEdit = PostEdit.builder()
+                .title(null)
+                .content("개발자")
+                .build();
+
+
+
+        // when, then
+        assertThrows(PostNotFound.class, () -> {
+            postService.edit(post.getId() + 1L, postEdit);
+        });
+    }
 }
